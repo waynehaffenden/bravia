@@ -73,13 +73,7 @@ class Bravia {
 
       let timer = setTimeout(() => {
         ssdp.stop();
-
-        if (discovered.length > 0) {
-          resolve(discovered);
-          return;
-        }
-
-        reject(new Error('No bravia devices discovered.'));
+        resolve(discovered);
       }, timeout);
     });
   }
