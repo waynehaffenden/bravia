@@ -11,10 +11,14 @@ class ServiceProtocol {
     return this.invoke('getVersions');
   }
 
-  getMethodTypes() {
+  getMethodTypes(version) {
     return new Promise((resolve, reject) => {
       if (this._methods.length > 0) {
-        resolve(this._methods);
+        if (version) {
+          resolve(this._methods.find(method => method.version === version));
+        } else {
+          resolve(this._methods);
+        }
         return;
       }
 
@@ -28,7 +32,11 @@ class ServiceProtocol {
           if (index < versions.length) {
             this.invoke('getMethodTypes', '1.0', versions[index++]).then(next, reject);
           } else {
-            resolve(this._methods);
+            if (version) {
+              resolve(this._methods.find(method => method.version === version));
+            } else {
+              resolve(this._methods);
+            }
           }
         };
 
