@@ -1,7 +1,7 @@
 {
   "name": "bravia",
   "description": "Node.js module for discovering and controlling Sony BRAVIA Android TVs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "keywords": [
     "sony",
     "bravia",

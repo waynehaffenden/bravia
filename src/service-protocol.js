@@ -4,7 +4,7 @@ class ServiceProtocol {
   constructor(bravia, protocol) {
     this.bravia = bravia;
     this.protocol = protocol;
-    this._methods = {};
+    this._methods = [];
   }
 
   getVersions() {
@@ -13,7 +13,7 @@ class ServiceProtocol {
 
   getMethodTypes() {
     return new Promise((resolve, reject) => {
-      if (Object.keys(this._methods).length > 0) {
+      if (this._methods.length > 0) {
         resolve(this._methods);
         return;
       }
@@ -23,6 +23,7 @@ class ServiceProtocol {
         let next = (results) => {
           if (results) {
             this._methods.push({ version: versions[index - 1], methods: results });
+          }
 
           if (index < versions.length) {
             this.invoke('getMethodTypes', '1.0', versions[index++]).then(next, reject);
