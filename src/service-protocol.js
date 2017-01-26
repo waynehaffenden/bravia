@@ -1,9 +1,9 @@
 'use strict';
 
 class ServiceProtocol {
-  constructor(bravia, endpoint) {
+  constructor(bravia, protocol) {
     this.bravia = bravia;
-    this.endpoint = endpoint;
+    this.protocol = protocol;
     this._methods = {};
   }
 
@@ -22,8 +22,7 @@ class ServiceProtocol {
         let index = 0;
         let next = (results) => {
           if (results) {
-            this._methods[versions[index - 1]] = results;
-          }
+            this._methods.push({ version: versions[index - 1], methods: results });
 
           if (index < versions.length) {
             this.invoke('getMethodTypes', '1.0', versions[index++]).then(next, reject);
@@ -41,7 +40,7 @@ class ServiceProtocol {
     return new Promise((resolve, reject) => {
       params = params ? [params] : [];
       this.bravia._request({
-        path: `/${this.endpoint}`,
+        path: `/${this.protocol}`,
         json: {
           id: 3,
           method: method,

@@ -35,7 +35,8 @@ Bravia.discover(timeout)
     for (let device in devices) {
       console.log(device);
     }
-  }).catch(error => console.error(error));
+  })
+  .catch(error => console.error(error));
 ```
 
 ### Service Protocol APIs

@@ -30,8 +30,8 @@ class Bravia {
     this.protocols = SERVICE_PROTOCOLS;
 
     for (let key in this.protocols) {
-      let endpoint = this.protocols[key];
-      this[endpoint] = new ServiceProtocol(this, endpoint);
+      let protocol = this.protocols[key];
+      this[protocol] = new ServiceProtocol(this, protocol);
     }
 
     this._url = `http://${this.host}:${this.port}/sony`;
