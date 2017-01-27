@@ -1,7 +1,7 @@
 {
   "name": "bravia",
   "description": "Node.js module for discovering and controlling Sony BRAVIA Android TVs",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "keywords": [
     "sony",
     "bravia",
@@ -27,6 +27,6 @@
   "dependencies": {
     "node-ssdp": "^2.8.0",
     "request": "^2.79.0",
-    "xml2json": "^0.11.0"
+    "xml2js": "^0.4.17"
   }
 }

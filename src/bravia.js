@@ -3,7 +3,8 @@
 const SsdpClient = require('node-ssdp').Client;
 const Request = require('request');
 const URL = require('url');
-const parser = require('xml2json');
+const parseString = require('xml2js').parseString;
+
 const ServiceProtocol = require('./service-protocol');
 
 const SSDP_SERVICE_TYPE = 'urn:schemas-sony-com:service:IRCC:1';
@@ -46,24 +47,28 @@ class Bravia {
         if (statusCode === 200) {
           Request.get(headers.LOCATION, (error, response, body) => {
             if (!error && response.statusCode === 200) {
-              let result = parser.toJson(body, { object: true });
-              let device = result.root.device;
+              parseString(body, (err, result) => {
+                if (!err) {
+                  try {
+                    let device = result.root.device[0];
+                    let service = device.serviceList[0].service
+                      .find(service => service.serviceType[0] === SSDP_SERVICE_TYPE);
 
-              let service = device.serviceList.service
-                .find(service => service.serviceType === SSDP_SERVICE_TYPE);
-
-              if (service) {
-                let api = URL.parse(service.controlURL);
-                discovered.push({
-                  host: api.host,
-                  port: (api.port || 80),
-                  friendlyName: device.friendlyName,
-                  manufacturer: device.manufacturer,
-                  manufacturerURL: device.manufacturerURL,
-                  modelName: device.modelName,
-                  UDN: device.UDN
-                });
-              }
+                    if (service) {
+                      let api = URL.parse(service.controlURL[0]);
+                      discovered.push({
+                        host: api.host,
+                        port: (api.port || 80),
+                        friendlyName: device.friendlyName[0],
+                        manufacturer: device.manufacturer[0],
+                        manufacturerURL: device.manufacturerURL[0],
+                        modelName: device.modelName[0],
+                        UDN: device.UDN[0]
+                      });
+                    }
+                  } catch(e) {}
+                }
+              });
             }
           });
         }
