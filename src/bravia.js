@@ -21,6 +21,7 @@ const SERVICE_PROTOCOLS = [
   'system',
   'videoScreen'
 ];
+const DEFAULT_TIME_BETWEEN_COMMANDS = 350;
 
 class Bravia {
   constructor(host, port = 80, psk = '0000', timeout = 5000) {
@@ -29,6 +30,7 @@ class Bravia {
     this.psk = psk;
     this.timeout = timeout;
     this.protocols = SERVICE_PROTOCOLS;
+    this.delay = DEFAULT_TIME_BETWEEN_COMMANDS;
 
     for (let key in this.protocols) {
       let protocol = this.protocols[key];
@@ -94,7 +96,7 @@ class Bravia {
     });
   }
 
-  getIrccCodes() {
+  getIRCCCodes() {
     return new Promise((resolve, reject) => {
       if (this._codes.length > 0) {
         resolve(this._codes);
@@ -109,30 +111,44 @@ class Bravia {
     });
   }
 
-  send(code) {
+  send(codes) {
     return new Promise((resolve, reject) => {
-      this.getIrccCodes()
-        .then(codes => {
-          let ircc = codes.find(ircc => ircc.name === code);
-          if (!ircc) {
-            reject(new Error(`Unknown IRCC code ${code}.`));
-            return;
-          }
+      if (typeof codes === 'string') {
+        codes = [codes];
+      }
 
-          let body = `<?xml version="1.0"?>
-              <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                  <s:Body>
-                      <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
-                          <IRCCCode>${ircc.value}</IRCCCode>
-                      </u:X_SendIRCC>
-                  </s:Body>
-              </s:Envelope>`;
+      let index = 0;
+      let next = () => {
+        if (index < codes.length) {
+          let code = codes[index++];
+          this.getIRCCCodes()
+            .then(response => {
+              let ircc = response.find(ircc => ircc.name === code);
+              if (!ircc) {
+                reject(new Error(`Unknown IRCC code ${code}.`));
+                return;
+              }
 
-          this._request({
-            path: '/IRCC',
-            body: body
-          }).then(response => resolve(), reject);
-        }, reject);
+              let body = `<?xml version="1.0"?>
+                  <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                      <s:Body>
+                          <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
+                              <IRCCCode>${ircc.value}</IRCCCode>
+                          </u:X_SendIRCC>
+                      </s:Body>
+                  </s:Envelope>`;
+
+              this._request({
+                path: '/IRCC',
+                body: body
+              }).then(() => setTimeout(() => resolve(), this.delay), reject);
+            }, reject);
+        } else {
+          resolve();
+        }
+      };
+
+      next();
     });
   }
 

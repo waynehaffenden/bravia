@@ -82,10 +82,13 @@ const Bravia = require('bravia');
 let bravia = new Bravia('192.168.1.2', '80', '0000');
 
 // Retrieves all the available IRCC commands from the TV.
-bravia.getIrccCodes()
+bravia.getIRCCCodes()
   .then(commands => console.log(commands))
   .catch(error => console.error(error));
 
-// Sends an IRCC code directly.
+// Sends an IRCC code signal.
 bravia.send('Mute');
+
+// Sends multiple IRCC code signals. Change bravia.delay to alter time between each command sent.
+bravia.send(['Up', 'Down', 'Left', 'Right']);
 ```
