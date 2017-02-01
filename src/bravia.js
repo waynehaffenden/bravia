@@ -66,10 +66,10 @@ class Bravia {
                       UDN: device.UDN[0]
                     });
                   } catch(e) {
-                    failed(new Error('Unexpected or malformed response data.'));
+                    failed(new Error(`Unexpected or malformed discovery response: ${result}.`));
                   }
                 } else {
-                  failed(new Error(`Failed to parse the response: ${body}.`));
+                  failed(new Error(`Failed to parse the discovery response: ${body}.`));
                 }
               });
             } else {
@@ -150,7 +150,23 @@ class Bravia {
         if (!error && response.statusCode === 200) {
           resolve(body);
         } else {
-          reject((error ? error : new Error(body.error[1])));
+          if (error) {
+            reject(error);
+          } else if (body.error) {
+            reject(new Error(body.error[1]));
+          } else {
+            parseString(body, (err, result) => {
+              if (!err) {
+                try {
+                  reject(new Error(result['s:Envelope']['s:Body'][0]['s:Fault'][0]['detail'][0]['UPnPError'][0]['errorDescription'][0]));
+                } catch (e) {
+                  reject(new Error(`Unexpected or malformed error response: ${result}.`));
+                }
+              } else {
+                reject(new Error(`Failed to parse the error response: ${body}.`));
+              }
+            });
+          }
         }
       });
     });
