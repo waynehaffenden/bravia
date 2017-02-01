@@ -44,7 +44,7 @@ class Bravia {
       let ssdp = new SsdpClient();
       let discovered = [];
 
-      ssdp.on('response', (headers, statusCode) => {
+      ssdp.on('response', (headers, statusCode, data) => {
         if (statusCode === 200) {
           Request.get(headers.LOCATION, (error, response, body) => {
             if (!error && response.statusCode === 200) {
@@ -55,27 +55,37 @@ class Bravia {
                     let service = device.serviceList[0].service
                       .find(service => service.serviceType[0] === SSDP_SERVICE_TYPE);
 
-                    if (service) {
-                      let api = URL.parse(service.controlURL[0]);
-                      discovered.push({
-                        host: api.host,
-                        port: (api.port || 80),
-                        friendlyName: device.friendlyName[0],
-                        manufacturer: device.manufacturer[0],
-                        manufacturerURL: device.manufacturerURL[0],
-                        modelName: device.modelName[0],
-                        UDN: device.UDN[0]
-                      });
-                    }
-                  } catch(e) {}
+                    let api = URL.parse(service.controlURL[0]);
+                    discovered.push({
+                      host: api.host,
+                      port: (api.port || 80),
+                      friendlyName: device.friendlyName[0],
+                      manufacturer: device.manufacturer[0],
+                      manufacturerURL: device.manufacturerURL[0],
+                      modelName: device.modelName[0],
+                      UDN: device.UDN[0]
+                    });
+                  } catch(e) {
+                    failed(new Error('Unexpected or malformed response data.'));
+                  }
+                } else {
+                  failed(new Error(`Failed to parse the response: ${body}.`));
                 }
               });
+            } else {
+              failed(new Error(`Error retrieving the description metadata for device ${data.address}.`));
             }
           });
         }
       });
 
       ssdp.search(SSDP_SERVICE_TYPE);
+
+      let failed = error => {
+        ssdp.stop();
+        clearTimeout(timer);
+        reject(error);
+      };
 
       let timer = setTimeout(() => {
         ssdp.stop();
