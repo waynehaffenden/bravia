@@ -36,6 +36,7 @@ class Bravia {
     }
 
     this._url = `http://${this.host}:${this.port}/sony`;
+    this._codes = [];
   }
 
   static discover(timeout = 3000) {
@@ -83,19 +84,45 @@ class Bravia {
     });
   }
 
-  send(ircc) {
-    let body = `<?xml version="1.0"?>
-        <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-            <s:Body>
-                <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
-                    <IRCCCode>${ircc}</IRCCCode>
-                </u:X_SendIRCC>
-            </s:Body>
-        </s:Envelope>`;
+  getIrccCodes() {
+    return new Promise((resolve, reject) => {
+      if (this._codes.length > 0) {
+        resolve(this._codes);
+        return;
+      }
 
-    return this._request({
-      path: '/IRCC',
-      body: body
+      this.system.invoke('getRemoteControllerInfo')
+        .then(codes => {
+          this._codes = codes;
+          resolve(this._codes);
+        }, reject);
+    });
+  }
+
+  send(code) {
+    return new Promise((resolve, reject) => {
+      this.getIrccCodes()
+        .then(codes => {
+          let ircc = codes.find(ircc => ircc.name === code);
+          if (!ircc) {
+            reject(new Error(`Unknown IRCC code ${code}.`));
+            return;
+          }
+
+          let body = `<?xml version="1.0"?>
+              <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                  <s:Body>
+                      <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
+                          <IRCCCode>${ircc.value}</IRCCCode>
+                      </u:X_SendIRCC>
+                  </s:Body>
+              </s:Envelope>`;
+
+          this._request({
+            path: '/IRCC',
+            body: body
+          }).then(response => resolve(), reject);
+        }, reject);
     });
   }
 

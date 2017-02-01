@@ -58,7 +58,7 @@ class ServiceProtocol {
         }
       }).then(response => {
         if (response.error) {
-          reject(response.error);
+          reject(new Error(response.error[1]));
           return;
         }
 

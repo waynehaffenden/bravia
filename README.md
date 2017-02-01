@@ -81,6 +81,11 @@ const Bravia = require('bravia');
 // Connects to a Bravia TV at 192.168.1.2:80 with the PSK 0000.
 let bravia = new Bravia('192.168.1.2', '80', '0000');
 
+// Retrieves all the available IRCC commands from the TV.
+bravia.getIrccCodes()
+  .then(commands => console.log(commands))
+  .catch(error => console.error(error));
+
 // Sends an IRCC code directly.
-bravia.send('AAAAAQAAAAEAAAAUAw=='); // Mute
+bravia.send('Mute');
 ```
