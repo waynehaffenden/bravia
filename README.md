@@ -1,4 +1,4 @@
-# Sony Bravia
+# Sony BRAVIA
 
 Node.js module for discovering and controlling Sony BRAVIA Android TVs. This module allows you retrieve all the available service protocol API methods and invoke any of them.
 

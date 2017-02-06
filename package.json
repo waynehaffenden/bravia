@@ -1,7 +1,7 @@
 {
   "name": "bravia",
   "description": "Node.js module for discovering and controlling Sony BRAVIA Android TVs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "sony",
     "bravia",
@@ -22,7 +22,7 @@
   "license": "MIT",
   "main": "src/bravia.js",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=5.0.0"
   },
   "dependencies": {
     "node-ssdp": "^2.8.0",
