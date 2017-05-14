@@ -129,19 +129,9 @@ class Bravia {
                 return;
               }
 
-              let body = `<?xml version="1.0"?>
-                  <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                      <s:Body>
-                          <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
-                              <IRCCCode>${ircc.value}</IRCCCode>
-                          </u:X_SendIRCC>
-                      </s:Body>
-                  </s:Envelope>`;
-
-              this._request({
-                path: '/IRCC',
-                body: body
-              }).then(() => setTimeout(() => resolve(), this.delay), reject);
+              this.sendIRCC(ircc.value)
+                .then(resolve)
+                .catch(reject);
             }, reject);
         } else {
           resolve();
@@ -149,6 +139,24 @@ class Bravia {
       };
 
       next();
+    });
+  }
+
+  sendIRCC(ircc) {
+    return new Promise((resolve, reject) => {
+      let body = `<?xml version="1.0"?>
+                  <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                      <s:Body>
+                          <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
+                              <IRCCCode>${ircc}</IRCCCode>
+                          </u:X_SendIRCC>
+                      </s:Body>
+                  </s:Envelope>`;
+
+      this._request({
+        path: '/IRCC',
+        body: body
+      }).then(() => setTimeout(() => resolve(), this.delay), reject);
     });
   }
 
