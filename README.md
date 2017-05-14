@@ -92,3 +92,14 @@ bravia.send('Mute');
 // Sends multiple IRCC code signals. Change bravia.delay to alter time between each command sent.
 bravia.send(['Up', 'Down', 'Left', 'Right']);
 ```
+### Send raw IRCC Code
+
+```javascript
+const Bravia = require('bravia');
+
+// Connects to a Bravia TV at 192.168.1.2:80 with the PSK 0000.
+let bravia = new Bravia('192.168.1.2', '80', '0000');
+
+// Send request to set source to HDMI1
+bravia.sendIRCC('AAAAAgAAABoAAABaAw==');
+```
