@@ -122,20 +122,20 @@ class Bravia {
         if (index < codes.length) {
           let code = codes[index++];
           this.getIRCCCodes()
-            .then(response => {
-              let ircc = response.find(ircc => ircc.name === code);
-              if (!ircc) {
-                reject(new Error(`Unknown IRCC code ${code}.`));
-                return;
-              }
+              .then(response => {
+                let ircc = response.find(ircc => ircc.name === code);
+                if (!ircc) {
+                  reject(new Error(`Unknown IRCC code ${code}.`));
+                  return;
+                }
 
-              this.sendIRCC(ircc.value)
-                .then(resolve)
-                .catch(reject);
-            }, reject);
-        } else {
-          resolve();
-        }
+                this.sendIRCC(ircc.value)
+                    .then(resolve)
+                    .catch(reject);
+              }, reject);
+          } else {
+            resolve();
+          }
       };
 
       next();
