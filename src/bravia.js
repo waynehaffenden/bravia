@@ -130,7 +130,7 @@ class Bravia {
                 }
 
                 this.sendIRCC(ircc.value)
-                    .then(resolve)
+                    .then(next)
                     .catch(reject);
               }, reject);
           } else {
