@@ -103,11 +103,12 @@ class Bravia {
         return;
       }
 
-      this.system.invoke('getRemoteControllerInfo')
-        .then(codes => {
-          this._codes = codes;
-          resolve(this._codes);
-        }, reject);
+      this.system
+          .invoke('getRemoteControllerInfo')
+          .then(codes => {
+            this._codes = codes;
+            resolve(this._codes);
+          }, reject);
     });
   }
 
@@ -116,35 +117,20 @@ class Bravia {
       if (typeof codes === 'string') {
         codes = [codes];
       }
-
+      
       let index = 0;
       let next = () => {
         if (index < codes.length) {
           let code = codes[index++];
           this.getIRCCCodes()
               .then(response => {
-                let ircc = response.find(ircc => ircc.name === code);
+                let ircc = response.find(ircc => ircc.name === code || ircc.value === code);
                 if (!ircc) {
                   reject(new Error(`Unknown IRCC code ${code}.`));
                   return;
                 }
 
-                this.sendIRCC(ircc.value)
-                    .then(next)
-                    .catch(reject);
-              }, reject);
-          } else {
-            resolve();
-          }
-      };
-
-      next();
-    });
-  }
-
-  sendIRCC(ircc) {
-    return new Promise((resolve, reject) => {
-      let body = `<?xml version="1.0"?>
+                let body = `<?xml version="1.0"?>
                   <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
                       <s:Body>
                           <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
@@ -153,10 +139,17 @@ class Bravia {
                       </s:Body>
                   </s:Envelope>`;
 
-      this._request({
-        path: '/IRCC',
-        body: body
-      }).then(() => setTimeout(() => resolve(), this.delay), reject);
+                this._request({
+                  path: '/IRCC',
+                  body: body
+                }).then(() => setTimeout(() => next(), this.delay), reject);
+              }, reject);
+          } else {
+            resolve();
+          }
+      };
+
+      next();
     });
   }
 
