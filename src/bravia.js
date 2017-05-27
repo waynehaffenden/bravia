@@ -195,6 +195,42 @@ class Bravia {
       });
     });
   }
+  static connect(pin, host, port, clientid, nickname) {
+    return new Promise((resolve, reject) => {
+      var options = {
+        method: 'POST',
+        url: 'http://' + host + ':' + port + '/sony/accessControl',
+        headers: {
+          'cache-control': 'no-cache',
+          'content-type': 'application/json'
+        },
+        body: {
+          method: 'actRegister',
+          params: [{
+              clientid: clientid,
+              nickname: nickname,
+              level: 'private'
+            },
+            [{
+              value: 'yes',
+              function: 'WOL'
+            }]
+          ],
+          id: 1,
+          version: '1.0'
+        },
+        json: true
+      };
+
+      Request(options, function(error, response, body) {
+        if (error) {
+          reject(error)
+        }
+
+        resolve(body);
+      });
+    })
+  }
 }
 
 module.exports = Bravia;
