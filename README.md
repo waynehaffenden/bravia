@@ -69,7 +69,7 @@ bravia.audio.invoke('getVolumeInformation')
   .catch(error => console.error(error));
 
 // Sets the speaker volume level to 50%.
-bravia.audio.invoke('setAudioVolume', '1.0', { target: 'speaker', volume: 50 });
+bravia.audio.invoke('setAudioVolume', '1.0', { target: 'speaker', volume: '50' });
 ```
 
 ### Send IRCC Code
