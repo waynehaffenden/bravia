@@ -55,8 +55,7 @@ class Bravia {
                   try {
                     let device = result.root.device[0];
                     let service = device.serviceList[0].service
-                      .find(service => service.serviceType[0] ===
-                        SSDP_SERVICE_TYPE);
+                      .find(service => service.serviceType[0] === SSDP_SERVICE_TYPE);
 
                     let api = URL.parse(service.controlURL[0]);
                     discovered.push({
@@ -64,26 +63,19 @@ class Bravia {
                       port: (api.port || 80),
                       friendlyName: device.friendlyName[0],
                       manufacturer: device.manufacturer[0],
-                      manufacturerURL: device.manufacturerURL[
-                        0],
+                      manufacturerURL: device.manufacturerURL[0],
                       modelName: device.modelName[0],
                       UDN: device.UDN[0]
                     });
-                  } catch (e) {
-                    failed(new Error(
-                      `Unexpected or malformed discovery response: ${result}.`
-                    ));
+                  } catch(e) {
+                    failed(new Error(`Unexpected or malformed discovery response: ${result}.`));
                   }
                 } else {
-                  failed(new Error(
-                    `Failed to parse the discovery response: ${body}.`
-                  ));
+                  failed(new Error(`Failed to parse the discovery response: ${body}.`));
                 }
               });
             } else {
-              failed(new Error(
-                `Error retrieving the description metadata for device ${data.address}.`
-              ));
+              failed(new Error(`Error retrieving the description metadata for device ${data.address}.`));
             }
           });
         }
@@ -130,20 +122,20 @@ class Bravia {
         if (index < codes.length) {
           let code = codes[index++];
           this.getIRCCCodes()
-            .then(response => {
-              let ircc = response.find(ircc => ircc.name === code);
-              if (!ircc) {
-                reject(new Error(`Unknown IRCC code ${code}.`));
-                return;
-              }
+              .then(response => {
+                let ircc = response.find(ircc => ircc.name === code);
+                if (!ircc) {
+                  reject(new Error(`Unknown IRCC code ${code}.`));
+                  return;
+                }
 
-              this.sendIRCC(ircc.value)
-                .then(next)
-                .catch(reject);
-            }, reject);
-        } else {
-          resolve();
-        }
+                this.sendIRCC(ircc.value)
+                    .then(next)
+                    .catch(reject);
+              }, reject);
+          } else {
+            resolve();
+          }
       };
 
       next();
@@ -152,8 +144,7 @@ class Bravia {
 
   sendIRCC(ircc) {
     return new Promise((resolve, reject) => {
-      let body =
-        `<?xml version="1.0"?>
+      let body = `<?xml version="1.0"?>
                   <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
                       <s:Body>
                           <u:X_SendIRCC xmlns:u="urn:schemas-sony-com:service:IRCC:1">
@@ -191,19 +182,12 @@ class Bravia {
             parseString(body, (err, result) => {
               if (!err) {
                 try {
-                  reject(new Error(result['s:Envelope']['s:Body']
-                    [0]['s:Fault'][0]['detail'][0][
-                      'UPnPError'
-                    ][0]['errorDescription'][0]));
+                  reject(new Error(result['s:Envelope']['s:Body'][0]['s:Fault'][0]['detail'][0]['UPnPError'][0]['errorDescription'][0]));
                 } catch (e) {
-                  reject(new Error(
-                    `Unexpected or malformed error response: ${result}.`
-                  ));
+                  reject(new Error(`Unexpected or malformed error response: ${result}.`));
                 }
               } else {
-                reject(new Error(
-                  `Failed to parse the error response: ${body}.`
-                ));
+                reject(new Error(`Failed to parse the error response: ${body}.`));
               }
             });
           }
