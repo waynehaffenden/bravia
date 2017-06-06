@@ -93,5 +93,5 @@ bravia.send('Mute');
 bravia.send('AAAAAQAAAAEAAAAUAw==');
 
 // Sends multiple IRCC code signals by name and/or value. Change bravia.delay to alter time between each command sent.
-bravia.send(['HDMI1', 'AAAAAgAAABoAAABaAw==', 'HDMI2', 'AAAAAgAAABoAAABbAw==']);
+bravia.send(['Hdmi1', 'AAAAAgAAABoAAABaAw==', 'Hdmi2', 'AAAAAgAAABoAAABbAw==']);
 ```
