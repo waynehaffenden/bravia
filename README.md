@@ -33,7 +33,7 @@ let timeout = 5000;
 Bravia.discover(timeout)
   .then(devices => {
     for (let device in devices) {
-      console.log(device);
+      console.log(devices[device]);
     }
   })
   .catch(error => console.error(error));
