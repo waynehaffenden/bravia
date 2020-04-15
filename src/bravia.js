@@ -54,6 +54,9 @@ class Bravia {
                 if (!err) {
                   try {
                     let device = result.root.device[0];
+                    if (!device.serviceList) {  // Not all devices return a serviceList (e.g. Philips Hue gateway responds without serviceList)
+                      return;
+                    }
                     let service = device.serviceList[0].service
                       .find(service => service.serviceType[0] === SSDP_SERVICE_TYPE);
 
@@ -117,7 +120,7 @@ class Bravia {
       if (typeof codes === 'string') {
         codes = [codes];
       }
-      
+
       let index = 0;
       let next = () => {
         if (index < codes.length) {
