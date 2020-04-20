@@ -180,6 +180,8 @@ class Bravia {
         } else {
           if (error) {
             reject(error);
+          } else if (response.statusCode != 200){
+            reject(new Error(`Response error, status code: ${response.statusCode}.`))
           } else if (body.error) {
             reject(new Error(body.error[1]));
           } else {
